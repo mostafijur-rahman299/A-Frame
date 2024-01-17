@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Hotspot with Icon in A-Frame</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <!-- Panorama image -->
+        <a-sky id="panorama" src="static/images/pexel.jpg" cursor-listener cursor="rayOrigin: mouse" rotation="0 -90 0"></a-sky>
+
+        <!-- Hotspot with Icon -->
+        <a-entity id="hotspot-container"></a-entity>
+    </a-scene>
+
+    <script>
+        AFRAME.registerComponent('cursor-listener', {
+            init: function () {
+                let hotspotContainer = document.getElementById('hotspot-container');
+                let hotspotData = [
+                    { position: '1 1.5 -5', rotation: '0 45 0', image: 'static/images/pexel2.jpg', info: 'Info for hotspot 1' },
+                    { position: '2 2 -4', rotation: '0 70 0', image: 'static/images/pexel2.jpg', info: 'Info for hotspot 2' }
+                ];
+
+                for (let i = 0; i < hotspotData.length; i++) {
+                    let hotspot = document.createElement('a-image');
+
+                    hotspot.setAttribute('src', 'static/images/h.gif')
+                    hotspot.setAttribute('width', '1');
+                    hotspot.setAttribute('height', '1');
+                    hotspot.setAttribute('position', hotspotData[i].position);
+                    hotspot.setAttribute('id', 'hotspot' + i);
+
+                    hotspotContainer.appendChild(hotspot);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
