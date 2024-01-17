@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Hotspot with Icon in A-Frame</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <!-- Panorama image -->
+        <a-sky id="panorama" src="static/images/pexel.jpg" cursor-listener cursor="rayOrigin: mouse" rotation="0 -90 0"></a-sky>
+
+        <!-- Hotspot with Icon -->
+        <a-entity id="hotspot-container"></a-entity>
+
+        <!-- Camera component -->
+        <a-camera></a-camera>
+
+    </a-scene>
+
+    <script>
+
+        const data = [
+            {
+                id: "1",
+                title: 'Drawing Room',
+                attributes: {
+                    src: "static/images/pexel2.jpg",
+                    rotation: "0 -90 0",
+                },
+                hotpots: [
+                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Bed Room', sceneID: '2' },
+                    { position: '2 2 -4', rotation: '0 70 0', info: 'Kitchen Room', sceneID: '3' },
+                    { position: '2 3 -4', rotation: '0 70 0', info: 'Bed Room', sceneID: '2' }
+                ],
+            },
+            {
+                id: "2",
+                title: 'Bed Room',
+                attributes: {
+                    src: "static/images/pexel.jpg",
+                    rotation: "0 -90 0",
+                },
+                hotpots: [
+                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Drawing Room', sceneID: '1' },
+                    { position: '2 1 -4', rotation: '0 70 0', info: 'Kitchen Room', sceneID: '3' },
+                    { position: '2 3 -4', rotation: '0 70 0', info: 'Drawing Room', sceneID: '1' }
+                ]
+            },
+            {
+                id: "3",
+                title: 'Kitchen Room',
+                attributes: {
+                    src: "static/images/2.jpeg",
+                    rotation: "0 -90 0",
+                },
+                hotpots: [
+                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Drawing Room', sceneID: '1' },
+                    { position: '2 0 -4', rotation: '0 70 0', info: 'Drawing Room', sceneID: '1' },
+                    { position: '2 3 -4', rotation: '0 70 0', info: 'Bed Room', sceneID: '2' }
+                ]
+            },
+        ]
+
+        function clearHotspots() {
+            // Clear previous hotspots by removing all child elements from the container
+            let hotspotContainer = document.getElementById('hotspot-container');
+            while (hotspotContainer.firstChild) {
+                hotspotContainer.removeChild(hotspotContainer.firstChild);
+            }
+        }
+
+        function loadSceneData(item){
+            // Clear previous hotspots before loading new ones
+            clearHotspots();
+
+            // Create a-sky with initial animation
+            let aSky = document.getElementById("panorama");
+            aSky.setAttribute('animation__fade', {
+                property: 'material.opacity',
+                dur: 2000,
+                from: 0,
+                to: 1,
+                easing: 'linear'
+            });
+
+            for (const key in item.attributes) {
+                aSky.setAttribute(key, item.attributes[key]);
+            }
+
+            // Add Hot-spot with initial animation
+            let hotspotContainer = document.getElementById('hotspot-container');
+
+            for (let i = 0; i < item.hotpots.length; i++) {
+                let hotspot = document.createElement('a-image');
+                hotspot.setAttribute('animation__fade', {
+                    property: 'material.opacity',
+                    dur: 1000,
+                    from: 0,
+                    to: 1,
+                    easing: 'linear'
+                });
+                hotspot.setAttribute('src', 'static/images/h.gif');
+                hotspot.setAttribute('width', '1');
+                hotspot.setAttribute('height', '1');
+                hotspot.setAttribute('position', item.hotpots[i].position);
+                hotspot.setAttribute('id', 'hotspot' + i);
+                hotspot.setAttribute('scene_id', item.hotpots[i].sceneID);
+
+                hotspotContainer.appendChild(hotspot);
+            }
+        }
+
+        AFRAME.registerComponent('cursor-listener', {
+            init: function () {
+                loadSceneData(data[0])
+
+                // Hot-spot click
+                const hotspot = this.el
+                hotspot.addEventListener('click', function (event) {
+                    const hotspotPosition = event.detail.intersection.point;
+
+                    const hotspotId = event.detail.intersectedEl.attributes.scene_id.value
+                    let sceneObj = data.find(obj => obj.id == hotspotId);
+                    loadSceneData(sceneObj);
+                });
+            }
+        });
+
+    </script>
+</body>
+
+</html>
