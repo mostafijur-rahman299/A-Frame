@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Hotspot with Icon in A-Frame</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <!-- Panorama image -->
+        <a-sky src="static/images/pexel.jpg" cursor-listener cursor="rayOrigin: mouse" raycaster="objects: .clickable" rotation="0 -90 0"></a-sky>
+
+        <!-- Hotspot with Icon -->
+        <a-image
+            src="static/images/h.gif"
+            width="0.5"
+            height="0.5"
+            position="1 1.5 -5"
+            rotation="0 45 0"
+            cursor="fuse: false; rayOrigin: mouse"
+            class="clickable"
+            raycaster="objects: .clickable"
+            id="hotspot"
+        >
+        </a-image>
+
+        <a-image
+            src="static/images/h.gif"
+            width="0.5"
+            height="0.5"
+            position="1 .5 -5"
+            rotation="0 45 0"
+            cursor="fuse: false; rayOrigin: mouse"
+            class="clickable"
+            raycaster="objects: .clickable"
+            id="hotspot2"
+        ></a-image>
+
+        
+    </a-scene>
+
+    <script>
+        AFRAME.registerComponent('cursor-listener', {
+            init: function () {
+                let hotspot = this.el;
+
+                hotspot.addEventListener('mouseenter', function () {
+                    // Change cursor style to pointer when entering the hotspot
+                    hotspot.setAttribute('cursor', 'fuse: false; rayOrigin: mouse;');
+                });
+
+                hotspot.addEventListener('mouseleave', function () {
+                    // Change cursor style back to default when leaving the hotspot
+                    hotspot.setAttribute('cursor', 'fuse: false; rayOrigin: mouse;');
+                });
+
+                hotspot.addEventListener('click', function (event) {
+                    console.log("Hello world===", event.detail.intersectedEl.id);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

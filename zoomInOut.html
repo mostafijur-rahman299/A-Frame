@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>360 Image with Mouse Scroll Zoom</title>
+    <meta
+      name="description"
+      content="360 Image with Mouse Scroll Zoom - A-Frame"
+    />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script>
+      window.addEventListener("wheel", (event) => {
+        // small increments for smoother zooming
+        const delta = event.wheelDelta / 120 / 10;
+        var mycam = document.getElementById("cam").getAttribute("camera");
+        var finalZoom =
+          document.getElementById("cam").getAttribute("camera").zoom + delta;
+
+        // limiting the zoom
+        if (finalZoom < 0.5) finalZoom = 0.5;
+        if (finalZoom > 2) finalZoom = 2;
+        mycam.zoom = finalZoom;
+
+        document.getElementById("cam").setAttribute("camera", mycam);
+      });
+    </script>
+  </head>
+
+  <body>
+    <a-scene>
+      <a-entity
+        id="cam"
+        camera="zoom: 1"
+        look-controls="reverseMouseDrag: true"
+      ></a-entity>
+
+      <a-assets>
+        <img
+          id="skyTexture"
+          crossorigin="anonymous"
+          src="static/images/pexel2.jpg"
+        />
+      </a-assets>
+      <a-sky src="#skyTexture"></a-sky>
+    </a-scene>
+  </body>
+</html>
