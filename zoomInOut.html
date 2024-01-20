@@ -2,46 +2,58 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>360 Image with Mouse Scroll Zoom</title>
-    <meta
-      name="description"
-      content="360 Image with Mouse Scroll Zoom - A-Frame"
-    />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script>
-      window.addEventListener("wheel", (event) => {
-        // small increments for smoother zooming
-        const delta = event.wheelDelta / 120 / 10;
-        var mycam = document.getElementById("cam").getAttribute("camera");
-        var finalZoom =
-          document.getElementById("cam").getAttribute("camera").zoom + delta;
-
-        // limiting the zoom
-        if (finalZoom < 0.5) finalZoom = 0.5;
-        if (finalZoom > 2) finalZoom = 2;
-        mycam.zoom = finalZoom;
-
-        document.getElementById("cam").setAttribute("camera", mycam);
-      });
-    </script>
+    <meta name="viewport" content="width=device-width" />
+    <title>Rotation on sky-element</title>
+    <script src="https://aframe.io/releases/0.3.2/aframe.min.js"></script>
   </head>
-
-  <body>
+  <body onload="testJs();">
     <a-scene>
-      <a-entity
-        id="cam"
-        camera="zoom: 1"
-        look-controls="reverseMouseDrag: true"
-      ></a-entity>
-
-      <a-assets>
-        <img
-          id="skyTexture"
-          crossorigin="anonymous"
-          src="static/images/pexel2.jpg"
-        />
-      </a-assets>
-      <a-sky src="#skyTexture"></a-sky>
+      <a-sky src="static/images/pexel.jpg" cursor-listener cursor="rayOrigin: mouse" rotation="0 -90 0">
+        <a-animation
+          attribute="rotation"
+          fill="forwards"
+          easing="linear"
+          dur="80000"
+          to="0 360 0"
+          repeat="indefinite"
+        ></a-animation>
+      </a-sky>
     </a-scene>
+
+    <script>
+      var box = document.querySelector("a-scene");
+      box.addEventListener("click", function () {
+        document.querySelector("a-animation").stop();
+
+        setTimeout(function () {
+          document.querySelector("a-animation").start();
+        }, 4000);
+      });
+
+      function is_touch_device() {
+        return (
+          "ontouchstart" in window ||
+          navigator.MaxTouchPoints > 0 ||
+          navigator.msMaxTouchPoints > 0
+        );
+      }
+
+      function testJs() {
+        var gyroPresent = false;
+        window.addEventListener("devicemotion", function (event) {
+          if (
+            event.rotationRate.alpha ||
+            event.rotationRate.beta ||
+            event.rotationRate.gamma
+          )
+            // Touch events are supported
+            document.querySelector("a-animation").stop();
+
+          setTimeout(function () {
+            document.querySelector("a-animation").start();
+          }, 4000);
+        });
+      }
+    </script>
   </body>
 </html>

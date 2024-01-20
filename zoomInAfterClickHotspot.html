@@ -10,19 +10,23 @@
 <body>
     <a-scene>
         <!-- Panorama image -->
-        <a-sky material="transparent: true" collider-check cursor-listener id="panorama" src="static/images/pexel.jpg"  cursor="rayOrigin: mouse" rotation="0 -90 0"></a-sky>
-        
+        <a-sky id="panorama" src="static/images/pexel.jpg" cursor-listener cursor="rayOrigin: mouse" rotation="0 -90 0">
+            
+        </a-sky>
 
         <!-- Add a camera entity -->
         <a-entity camera look-controls></a-entity>
 
         <!-- Hotspot with Icon -->
         <a-entity id="hotspot-container"></a-entity>
+
+    
     </a-scene>
 
     <script>
 
         let aSky = document.getElementById("panorama");
+        let currentRotation = { x: 0, y: -90, z: 0 };
 
         const data = [
             {
@@ -78,29 +82,16 @@
             // Clear previous hotspots before loading new ones
             clearHotspots();
 
-            // Remove animation attribute from the sky element
-            aSky.emit('fireanimation')
+            // Reset camera zoom to its initial state
+            if(aSky.sceneEl.camera){
+                aSky.sceneEl.camera.zoom = 1;
+                aSky.sceneEl.camera.updateProjectionMatrix();
+            }
 
             for (const key in item.attributes) {
                 aSky.setAttribute(key, item.attributes[key]);
             }
 
-            aSky.setAttribute(`animation`, {
-                property: 'position',
-                to: `0 0 0`,
-                dur: 1000,
-                easing: 'linear',
-                loop: false
-            })
-
-            setTimeout(function(){
-                // Reset camera zoom to its initial state
-                if(aSky.sceneEl.camera){
-                    aSky.sceneEl.camera.zoom = 0.5;
-                    aSky.sceneEl.camera.updateProjectionMatrix();
-                }
-            }, 500)
-            
             // Add Hot-spot with initial animation
             let hotspotContainer = document.getElementById('hotspot-container');
 
@@ -133,20 +124,16 @@
                 hotspot.addEventListener('click', function (event) {
                     const hotspotPosition = event.detail.intersection.point;
 
-                    // camera zoom to its initial state
-                    aSky.setAttribute(`animation`, {
-                        property: 'position',
-                        to: `${parseFloat(hotspotPosition.x)} ${parseFloat(hotspotPosition.y)} 200`,
-                        dur: 1000,
-                        easing: 'linear',
-                        loop: false
-                    })
-                   
-                    setTimeout(() => {
-                        const hotspotId = event.detail.intersectedEl.attributes.scene_id.value;
-                        let sceneObj = data.find((obj) => obj.id == hotspotId);
+                    // Reset camera zoom to its initial state
+                    aSky.sceneEl.camera.zoom = 3;
+                    aSky.sceneEl.camera.updateProjectionMatrix();
+                    
+
+                    setTimeout(function(){
+                        const hotspotId = event.detail.intersectedEl.attributes.scene_id.value
+                        let sceneObj = data.find(obj => obj.id == hotspotId);
                         loadSceneData(sceneObj);
-                    }, 1000); // Adjust the delay time as needed
+                    }, 1000)
                 });
             }
         });
