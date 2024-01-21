@@ -1,43 +1,76 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>Rotation on sky-element</title>
-  <script src="https://aframe.io/releases/0.3.2/aframe.min.js"></script>
-</head>
-<body onload="testJs();">
-  <a-scene class="fullscreen">
-    
-    <a-sky src="static/images/pexel.jpg">
-      <a-animation attribute="rotation" fill="forwards" easing="linear" dur="80000" to="0 360 0" repeat="indefinite"></a-animation>
-    </a-sky>
 
+<head>
+    <meta charset="utf-8">
+    <title>Hotspot with Icon in A-Frame</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <a-entity id="rotating-entity" animation__rotation="property: rotation; to: 0 -90 0; dur: 6000; easing: linear; loop: true"
+            animation__scale="property: scale; to: 1.2 1.2 1.2; dur: 2000; dir: alternate; easing: easeInOutQuad; loop: true">
+            <!-- Panorama image -->
+            <a-sky control-rotating src="static/images/pexel.jpg" raycaster="objects: .clickable" cursor="rayOrigin: mouse"
+                class="clickable">
+            </a-sky>
+
+            <!-- Hotspot with Icon -->
+            <a-image
+                src="static/images/h.gif"
+                width="0.5"
+                height="0.5"
+                position="1 1.5 -5"
+                rotation="0 45 0"
+                cursor="fuse: false; rayOrigin: mouse"
+                class="clickable"
+                raycaster="objects: .clickable"
+                id="hotspot"
+                hotspot-click-listner
+            >
+            </a-image>
+
+            <a-image
+                src="static/images/h.gif"
+                width="0.5"
+                height="0.5"
+                position="1 .5 -5"
+                rotation="0 45 0"
+                cursor="fuse: false; rayOrigin: mouse"
+                class="clickable"
+                raycaster="objects: .clickable"
+                id="hotspot2"
+                hotspot-click-listner
+            ></a-image>
+
+        </a-entity>
+    </a-scene>
 
     <script>
-      var box = document.querySelector('a-scene');
-        box.addEventListener('click', function () {
-        console.log("test");
-        document.querySelector('a-animation').stop();
-        });
+        AFRAME.registerComponent('control-rotating', {
+            init: function () {
+                console.log("called===================")
 
-      function is_touch_device() {
-        return (('ontouchstart' in window)
-            || (navigator.MaxTouchPoints > 0)
-            || (navigator.msMaxTouchPoints > 0));
+                const aSky = this.el
+                aSky.addEventListener("click", function (event) {
+                    console.log("Sky clicked");
+                    pauseAndResumeRotation();
+                })
+            }
+        })
+
+        function pauseAndResumeRotation() {
+            var rotatingEntity = document.getElementById('rotating-entity');
+
+            // Pause rotation for 2 seconds
+            rotatingEntity.components.animation__rotation.pause();
+            setTimeout(function () {
+                // Resume rotation after 2 seconds
+                rotatingEntity.components.animation__rotation.play();
+            }, 7000);
         }
-      function testJs() {
-        
-                var gyroPresent = false;
-        window.addEventListener("devicemotion", function(event){
-            if(event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)
-                
-            // Touch events are supported
-                document.querySelector('a-animation').stop();
-            
-        });
-       
-      }
     </script>
 </body>
+
 </html>

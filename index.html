@@ -9,175 +9,92 @@
 
 <body>
     <a-scene>
-        <!-- Panorama image -->
-        <a-sky material="transparent: true" collider-check cursor-listener id="panorama" src="static/images/pexel.jpg"  cursor="rayOrigin: mouse" rotation="0 -90 0"></a-sky>
-        
+      <a-sky src="static/images/pexel2.jpg"></a-sky>
 
-        <!-- Add a camera entity -->
-        <a-entity camera look-controls></a-entity>
-
-        <!-- Hotspot with Icon -->
-        <a-entity id="hotspot-container"></a-entity>
+      <a-box dragndrop position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-sphere dragndrop position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+      <a-cylinder dragndrop position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      
     </a-scene>
 
     <script>
-
-        let aSky = document.getElementById("panorama");
-
-        const data = [
-            {
-                id: "1",
-                title: 'Drawing Room',
-                attributes: {
-                    src: "static/images/pexel2.jpg",
-                    rotation: "0 -90 0",
-                },
-                hotpots: [
-                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Bed Room', sceneID: '2' },
-                    { position: '2 2 -4', rotation: '0 70 0', info: 'Kitchen Room', sceneID: '3' },
-                    { position: '2 3 -4', rotation: '0 70 0', info: 'Bed Room', sceneID: '2' }
-                ],
-            },
-            {
-                id: "2",
-                title: 'Bed Room',
-                attributes: {
-                    src: "static/images/pexel.jpg",
-                    rotation: "0 -90 0",
-                },
-                hotpots: [
-                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Drawing Room', sceneID: '1' },
-                    { position: '2 1 -4', rotation: '0 70 0', info: 'Kitchen Room', sceneID: '3' },
-                    { position: '2 3 -4', rotation: '0 70 0', info: 'Drawing Room', sceneID: '1' }
-                ]
-            },
-            {
-                id: "3",
-                title: 'Kitchen Room',
-                attributes: {
-                    src: "static/images/2.jpeg",
-                    rotation: "0 -90 0",
-                },
-                hotpots: [
-                    { position: '1 1.5 -5', rotation: '0 45 0', info: 'Drawing Room', sceneID: '1' },
-                    { position: '2 0 -4', rotation: '0 70 0', info: 'Drawing Room', sceneID: '1' },
-                    { position: '2 3 -4', rotation: '0 70 0', info: 'Bed Room', sceneID: '2' }
-                ]
-            },
-        ]
-
-        function clearHotspots() {
-            // Clear previous hotspots by removing all child elements from the container
-            let hotspotContainer = document.getElementById('hotspot-container');
-            while (hotspotContainer.firstChild) {
-                hotspotContainer.removeChild(hotspotContainer.firstChild);
-            }
-        }
-
-        function loadSceneData(item){
-            // Clear previous hotspots before loading new ones
-            clearHotspots();
-
-            // Remove animation attribute from the sky element
-            aSky.emit('fireanimation')
-
-            for (const key in item.attributes) {
-                aSky.setAttribute(key, item.attributes[key]);
-            }
-
-            aSky.setAttribute(`animation`, {
-                property: 'position',
-                to: `0 0 0`,
-                dur: 1000,
-                easing: 'linear',
-                loop: false
-            })
-
-            setTimeout(function(){
-                // Reset camera zoom to its initial state
-                if(aSky.sceneEl.camera){
-                    aSky.sceneEl.camera.zoom = 0.5;
-                    aSky.sceneEl.camera.updateProjectionMatrix();
-                }
-            }, 500)
-            
-            // Add Hot-spot with initial animation
-            let hotspotContainer = document.getElementById('hotspot-container');
-
-            for (let i = 0; i < item.hotpots.length; i++) {
-                let hotspot = document.createElement('a-image');
-                hotspot.setAttribute('animation__fade', {
-                    property: 'material.opacity',
-                    dur: 1000,
-                    from: 0,
-                    to: 1,
-                    easing: 'linear'
-                });
-                hotspot.setAttribute('src', 'static/images/h.gif');
-                hotspot.setAttribute('width', '1');
-                hotspot.setAttribute('height', '1');
-                hotspot.setAttribute('position', item.hotpots[i].position);
-                hotspot.setAttribute('id', 'hotspot' + i);
-                hotspot.setAttribute('scene_id', item.hotpots[i].sceneID);
-
-                hotspotContainer.appendChild(hotspot);
-            }
-        }
-
-        AFRAME.registerComponent('cursor-listener', {
-            init: function () {
-                loadSceneData(data[0])
-
-                // Hot-spot click
-                const hotspot = this.el
-                hotspot.addEventListener('click', function (event) {
-                    const hotspotPosition = event.detail.intersection.point;
-
-                    // camera zoom to its initial state
-                    aSky.setAttribute(`animation`, {
-                        property: 'position',
-                        to: `${parseFloat(hotspotPosition.x)} ${parseFloat(hotspotPosition.y)} 200`,
-                        dur: 1000,
-                        easing: 'linear',
-                        loop: false
-                    })
-                   
-                    setTimeout(() => {
-                        const hotspotId = event.detail.intersectedEl.attributes.scene_id.value;
-                        let sceneObj = data.find((obj) => obj.id == hotspotId);
-                        loadSceneData(sceneObj);
-                    }, 1000); // Adjust the delay time as needed
-                });
-            }
-        });
-
-        AFRAME.registerComponent('auto-zoom', {
-            init: function () {
-              this.zoomFactor = 0.2; // Initial zoom factor
-              this.zoomSpeed = 0.001; // Adjust this value to control zoom speed
-  
-              // Listen for wheel events to adjust zoom
-              window.addEventListener('wheel', this.onWheel.bind(this));
-            },
-  
-            onWheel: function (event) {
-              // Adjust zoom based on wheel delta
-              this.zoomFactor += event.deltaY * this.zoomSpeed;
-  
-              // Limit zoom factor to prevent too close or too far
-              this.zoomFactor = Math.max(0.5, Math.min(2.0, this.zoomFactor));
-  
-              // Set the camera's zoom level
-              this.el.sceneEl.camera.zoom = this.zoomFactor;
-  
-              // Update camera attributes
-              this.el.sceneEl.camera.updateProjectionMatrix();
+        if (window.AFRAME == null) {
+            console.error("aframe not found, please import it before this component.")
+          }
+          
+          AFRAME.registerSystem("track-cursor", {
+            init: function() {
+              this.el.setAttribute("cursor", { rayOrigin: "mouse" });
             }
           });
-  
-        // Attach the auto-zoom component to the camera entity
-        document.querySelector('a-entity[camera]').setAttribute('auto-zoom', '');
+          
+          AFRAME.registerComponent("track-cursor", {
+            init: function() {
+              this.el.addEventListener("mousedown", e => {
+                if (this.el.is("cursor-hovered")) {
+                  this.el.sceneEl.camera.el.setAttribute("look-controls", {
+                    enabled: false
+                  });
+                  this.el.addState("dragging");
+                }
+              })
+              this.el.addEventListener("click", e => {
+                if (this.el.is("dragging")) {
+                  this.el.sceneEl.camera.el.setAttribute("look-controls", {
+                    enabled: true
+                  });
+                  this.el.removeState("dragging");
+                }
+              })
+            },
+          });
+          
+          AFRAME.registerComponent("dragndrop", {
+            dependencies: ["track-cursor"],
+            init: function() {
+              this.range = 0;
+              this.dist = 0;
+          
+              this.el.addEventListener("stateadded", e => {
+                if (e.detail == "dragging") {
+                  this.range = 0;
+                  this.dist = this.el.object3D.position
+                    .clone()
+                    .sub(this.el.sceneEl.camera.el.object3D.position)
+                    .length();
+                }
+              })
+          
+              this.direction = new AFRAME.THREE.Vector3();
+              this.target = new AFRAME.THREE.Vector3();
+              document.addEventListener("wheel", e => {
+                if (e.deltaY < 0) {
+                  this.range += 0.1;
+                } else {
+                  this.range -= 0.1;
+                }
+              });
+            },
+            updateDirection: function() {
+              this.direction.copy(this.el.sceneEl.getAttribute("raycaster").direction);
+            },
+            updateTarget: function() {
+              let camera = this.el.sceneEl.camera.el
+              this.target.copy(
+                camera.object3D.position
+                  .clone()
+                  .add(this.direction.clone().multiplyScalar(this.dist + this.range))
+              );
+            },
+            tick: function() {
+              if (this.el.is("dragging")) {
+                this.updateDirection();
+                this.updateTarget();
+                this.el.object3D.position.copy(this.target);
+              }
+            }
+          });
     </script>
-</body>
+  </body>
 
 </html>
